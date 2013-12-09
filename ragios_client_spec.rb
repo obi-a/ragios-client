@@ -9,6 +9,8 @@ monitors = [{monitor: "my website",
            via: "twtter_notifier",
            plugin: "url_monitor" }]
 
+ragios.login('admin', 'password')
+
 ragios.add monitors
 
 ragios.find(monitor_id)
