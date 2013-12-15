@@ -1,16 +1,51 @@
 = ragios-client
 
-Description goes here.
+Documentation coming soon.
 
-== Contributing to ragios-client
- 
-* Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet.
-* Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it.
-* Fork the project.
-* Start a feature/bugfix branch.
-* Commit and push until you are happy with your contribution.
-* Make sure to add tests for it. This is important so I don't break it in a future version unintentionally.
-* Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
+== Specifications
+ require 'ragios-client'
+
+ ragios = Ragios::Client.new
+
+ ragios = Ragios::Client.new(username: 'admin', password: 'password')
+
+ ragios.login('admin', 'password')
+
+ monitors = [{monitor: "my website",
+		      every: "5m",
+              url: "http://mywebsite.com",
+              via: "twtter_notifier",
+              plugin: "url_monitor" }]
+
+
+
+ ragios.add monitors
+
+ ragios.find(monitor_id)
+
+ ragios.all
+
+ ragios.stop(monitor_id)
+
+ ragios.restart(monitor_id)
+
+ ragios.delete(monitor_id)
+
+ ragios.find_by(options)
+
+ ragios.update(monitor_id, options)
+
+ ragios.test(monitor_id)
+
+ ragios.address = 'http://localhost'
+ ragios.port = '5041'
+
+ ragios.address
+ #=> http://localhost
+
+ ragios.port
+ #=> 5041
+
 
 == Copyright
 
