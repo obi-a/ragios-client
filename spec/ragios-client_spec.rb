@@ -372,8 +372,8 @@ describe "Ragios Client" do
   end
 
   it "accepts new default address" do
-    ragios_client = Ragios::Client.new(address: 'http://mysite.com', port: '6802')
-    ragios_client.address.should == "http://mysite.com"
+    ragios_client = Ragios::Client.new(address: 'https://mysite.com', port: '6802')
+    ragios_client.address.should == "https://mysite.com"
     ragios_client.port.should == "6802"
     ragios_client.username.should == ""
     ragios_client.password.should == ""
@@ -383,6 +383,14 @@ describe "Ragios Client" do
     ragios_client = Ragios::Client.new(username: 'superadmin', password: 'abc123')
     ragios_client.address.should == "http://127.0.0.1"
     ragios_client.port.should == "5041"
+    ragios_client.username.should == "superadmin"
+    ragios_client.password.should == "abc123"
+  end
+
+    it "accepts new default settings" do
+    ragios_client = Ragios::Client.new(username: 'superadmin', password: 'abc123', address: 'https://mysite.com', port: '6802')
+    ragios_client.address.should == "https://mysite.com"
+    ragios_client.port.should == "6802"
     ragios_client.username.should == "superadmin"
     ragios_client.password.should == "abc123"
   end
