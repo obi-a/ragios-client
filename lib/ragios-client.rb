@@ -3,15 +3,20 @@ require 'yajl'
 require 'uri'
 
 module Ragios
+
+  class ClientException < StandardError; end
+
   class Client
     attr_accessor :address
     attr_accessor :port
 
-    def initialize(address = 'http://127.0.0.1', port = '5041')
-      @address = address
-      @port = port
+    def initialize(args)
+      @address = args.fetch(:address, 'http://127.0.0.1')
+      @port = args.fetch(:port, '5041')
+      @username = args.fetch(:username, '')
+      @password = args.fetch(:password, '')
       @http_request_options = {:content_type => :json,
-                               :cookies => {:AuthSession => @auth_session}}
+                               :cookies => {:AuthSession => auth_session}}
       @auth_cookie =  {:cookies => {:AuthSession => auth_session}}
     end
 
@@ -19,51 +24,81 @@ module Ragios
       @username = username
       @password = password
       auth_session
+    rescue => e
+      raise ClientException, e.response
     end
 
     def add(monitors)
-      RestClient.post "#{address_port}/monitors/", json(monitors), @http_request_options
+      response = RestClient.post "#{address_port}/monitors/", json(monitors), @http_request_options
+      parse_json(response.body)
+    rescue => e
+      raise ClientException, e.response
     end
 
     def find(monitor_id)
-      RestClient.get "#{address_port}/monitors/#{monitor_id}/",@auth_cookie
+      response = RestClient.get "#{address_port}/monitors/#{monitor_id}/",@auth_cookie
+      parse_json(response.body)
+    rescue => e
+      raise ClientException, e.response
     end
 
     def all
-      RestClient.get "#{address_port}/monitors/",@auth_cookie
+      response = RestClient.get "#{address_port}/monitors/",@auth_cookie
+      parse_json(response.body)
     end
 
     def stop(monitor_id)
-      RestClient.put "#{address_port}/monitors/#{monitor_id}",{:status => "stopped"}, @http_request_options
+      response = RestClient.put "#{address_port}/monitors/#{monitor_id}",{:status => "stopped"}, @http_request_options
+      parse_json(response)
+    rescue => e
+      raise ClientException, e.response
     end
 
     def restart(monitor_id)
-      RestClient.put "#{address_port}/monitors/#{monitor_id}",{:status => "active"},@options
+      response = RestClient.put "#{address_port}/monitors/#{monitor_id}",{:status => "active"},@http_request_options
+      parse_json(response)
+    rescue => e
+      raise ClientException, e.response
     end
 
     def delete(monitor_id)
-      RestClient.delete "#{address_port}/monitors/#{monitor_id}", @auth_cookie
+      response = RestClient.delete "#{address_port}/monitors/#{monitor_id}", @auth_cookie
+      parse_json(response)
+    rescue => e
+      raise ClientException, e.response
     end
 
     def find_by(options)
-      RestClient.get "#{address_port}/monitors?#{URI.encode_www_form(options)}", @auth_cookie
+      response = RestClient.get "#{address_port}/monitors?#{URI.encode_www_form(options)}", @auth_cookie
+      parse_json(response)
     end
 
     def update(monitor_id, options)
-      RestClient.put "#{address_port}/monitors/#{monitor_id}",json(options), @http_request_options
+      response = RestClient.put "#{address_port}/monitors/#{monitor_id}",json(options), @http_request_options
+      parse_json(response)
+    rescue => e
+      raise ClientException, e.response
     end
 
     def test(monitor_id)
-      RestClient.post '#{address_port}/tests', {:id => monitor_id}, @http_request_options
+      response = RestClient.post "#{address_port}/tests", {:id => monitor_id}, @http_request_options
+      parse_json(response)
+    rescue => e
+      raise ClientException, e.response
     end
 
 private
+
     def address_port
       "#{@address}:#{@port}"
     end
 
     def json(str)
       Yajl::Encoder.encode(str)
+    end
+
+    def parse_json(str)
+      Yajl::Parser.parse(str, :symbolize_keys => true)
     end
 
     def auth_session
