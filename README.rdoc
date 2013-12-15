@@ -9,6 +9,10 @@ Documentation coming soon.
 
  ragios = Ragios::Client.new(username: 'admin', password: 'password')
 
+ ragios = Ragios::Client.new(address: 'http://localhost', port: '5041')
+
+ ragios = Ragios::Client.new(username: 'admin', password: 'password', address: 'http://localhost', port: '5041')
+
  ragios.login('admin', 'password')
 
  monitors = [{monitor: "my website",
@@ -36,9 +40,6 @@ Documentation coming soon.
  ragios.update(monitor_id, options)
 
  ragios.test(monitor_id)
-
- ragios.address = 'http://localhost'
- ragios.port = '5041'
 
  ragios.address
  #=> http://localhost

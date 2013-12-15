@@ -362,4 +362,29 @@ describe "Ragios Client" do
     hash = @ragios.delete(monitor_id)
     hash[:ok].should == true
   end
+
+  it "has default settings" do
+    ragios_client = Ragios::Client.new
+    ragios_client.address.should == "http://127.0.0.1"
+    ragios_client.port.should == "5041"
+    ragios_client.username.should == ""
+    ragios_client.password.should == ""
+  end
+
+  it "accepts new default address" do
+    ragios_client = Ragios::Client.new(address: 'http://mysite.com', port: '6802')
+    ragios_client.address.should == "http://mysite.com"
+    ragios_client.port.should == "6802"
+    ragios_client.username.should == ""
+    ragios_client.password.should == ""
+  end
+
+  it "accepts new default login credentials" do
+    ragios_client = Ragios::Client.new(username: 'superadmin', password: 'abc123')
+    ragios_client.address.should == "http://127.0.0.1"
+    ragios_client.port.should == "5041"
+    ragios_client.username.should == "superadmin"
+    ragios_client.password.should == "abc123"
+  end
+
 end

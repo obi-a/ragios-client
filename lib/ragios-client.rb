@@ -7,87 +7,94 @@ module Ragios
   class ClientException < StandardError; end
 
   class Client
-    attr_accessor :address
-    attr_accessor :port
+    attr_reader :address
+    attr_reader :port
+    attr_reader :username
+    attr_reader :password
 
-    def initialize(args)
+    def initialize(args = {})
       @address = args.fetch(:address, 'http://127.0.0.1')
       @port = args.fetch(:port, '5041')
       @username = args.fetch(:username, '')
       @password = args.fetch(:password, '')
-      @http_request_options = {:content_type => :json,
-                               :cookies => {:AuthSession => auth_session}}
-      @auth_cookie =  {:cookies => {:AuthSession => auth_session}}
     end
 
     def login(username,password)
       @username = username
       @password = password
       auth_session
-    rescue => e
-      raise ClientException, e.response
     end
 
     def add(monitors)
-      response = RestClient.post "#{address_port}/monitors/", json(monitors), @http_request_options
+      response = RestClient.post "#{address_port}/monitors/", json(monitors), http_request_options
       parse_json(response.body)
     rescue => e
       raise ClientException, e.response
     end
 
     def find(monitor_id)
-      response = RestClient.get "#{address_port}/monitors/#{monitor_id}/",@auth_cookie
+      response = RestClient.get "#{address_port}/monitors/#{monitor_id}/", auth_cookie
       parse_json(response.body)
     rescue => e
       raise ClientException, e.response
     end
 
     def all
-      response = RestClient.get "#{address_port}/monitors/",@auth_cookie
+      response = RestClient.get "#{address_port}/monitors/", auth_cookie
       parse_json(response.body)
     end
 
     def stop(monitor_id)
-      response = RestClient.put "#{address_port}/monitors/#{monitor_id}",{:status => "stopped"}, @http_request_options
+      response = RestClient.put "#{address_port}/monitors/#{monitor_id}",{:status => "stopped"}, http_request_options
       parse_json(response)
     rescue => e
       raise ClientException, e.response
     end
 
     def restart(monitor_id)
-      response = RestClient.put "#{address_port}/monitors/#{monitor_id}",{:status => "active"},@http_request_options
+      response = RestClient.put "#{address_port}/monitors/#{monitor_id}",{:status => "active"},http_request_options
       parse_json(response)
     rescue => e
       raise ClientException, e.response
     end
 
     def delete(monitor_id)
-      response = RestClient.delete "#{address_port}/monitors/#{monitor_id}", @auth_cookie
+      response = RestClient.delete "#{address_port}/monitors/#{monitor_id}", auth_cookie
       parse_json(response)
     rescue => e
       raise ClientException, e.response
     end
 
     def find_by(options)
-      response = RestClient.get "#{address_port}/monitors?#{URI.encode_www_form(options)}", @auth_cookie
+      response = RestClient.get "#{address_port}/monitors?#{URI.encode_www_form(options)}", auth_cookie
       parse_json(response)
     end
 
     def update(monitor_id, options)
-      response = RestClient.put "#{address_port}/monitors/#{monitor_id}",json(options), @http_request_options
+      response = RestClient.put "#{address_port}/monitors/#{monitor_id}",json(options), http_request_options
       parse_json(response)
     rescue => e
       raise ClientException, e.response
     end
 
     def test(monitor_id)
-      response = RestClient.post "#{address_port}/tests", {:id => monitor_id}, @http_request_options
+      response = RestClient.post "#{address_port}/tests", {:id => monitor_id}, http_request_options
       parse_json(response)
     rescue => e
       raise ClientException, e.response
     end
 
 private
+
+    def auth_cookie
+      {:cookies => {:AuthSession => auth_session}}
+    end
+
+    def http_request_options
+      {:content_type => :json,
+       :cookies => {:AuthSession => auth_session}
+      }
+    end
 
     def address_port
       "#{@address}:#{@port}"
@@ -106,6 +113,8 @@ private
       auth = RestClient.post "#{address_port}/session", { :username=> @username, :password => @password}
       hash = Yajl::Parser.parse(auth.to_str)
       hash['AuthSession']
+    rescue => e
+      raise ClientException, e.response
     end
   end
 end
