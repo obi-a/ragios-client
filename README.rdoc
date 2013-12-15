@@ -16,12 +16,11 @@ Documentation coming soon.
  ragios.login('admin', 'password')
 
  monitors = [{monitor: "my website",
-		      every: "5m",
-              url: "http://mywebsite.com",
-              via: "twtter_notifier",
-              plugin: "url_monitor" }]
-
-
+  every: "5m",
+  url: "http://mywebsite.com",
+  via: "twtter_notifier",
+  plugin: "url_monitor"
+ }]
 
  ragios.add monitors
 
