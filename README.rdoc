@@ -1,8 +1,8 @@
 = ragios-client
 
-Documentation coming soon.
+{Documentation}[http://www.whisperservers.com/ragios/ragios-saint-ruby/using-ragios]
 
-== Specifications
+== usage
  require 'ragios-client'
 
  ragios = Ragios::Client.new
