@@ -40,6 +40,14 @@ end
 #  test.rcov_opts << '--exclude "gems/*"'
 #end
 
+task :repl do
+  ragios_client_file = File.expand_path(File.join(File.dirname(__FILE__), '..', 'ragios-client/lib/ragios-client'))
+  irb = "bundle exec pry -r #{ragios_client_file}"
+  sh irb
+end
+
+task :r => :repl
+
 task :default => :test
 
 require 'rdoc/task'
