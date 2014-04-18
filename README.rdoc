@@ -34,7 +34,7 @@
 
  ragios.delete(monitor_id)
 
- ragios.find_by(options)
+ ragios.where(options)
 
  ragios.update(monitor_id, options)
 

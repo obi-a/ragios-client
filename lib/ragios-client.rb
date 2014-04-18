@@ -29,14 +29,14 @@ module Ragios
       response = RestClient.post "#{address_port}/monitors/", json(monitors), http_request_options
       parse_json(response.body)
     rescue => e
-      raise ClientException, e.response
+      raise_error(e)
     end
 
     def find(monitor_id)
       response = RestClient.get "#{address_port}/monitors/#{monitor_id}/", auth_cookie
       parse_json(response.body)
     rescue => e
-      raise ClientException, e.response
+      raise_error(e)
     end
 
     def all
@@ -48,24 +48,24 @@ module Ragios
       response = RestClient.put "#{address_port}/monitors/#{monitor_id}",{:status => "stopped"}, http_request_options
       parse_json(response)
     rescue => e
-      raise ClientException, e.response
+      raise_error(e)
     end
 
     def restart(monitor_id)
       response = RestClient.put "#{address_port}/monitors/#{monitor_id}",{:status => "active"},http_request_options
       parse_json(response)
     rescue => e
-      raise ClientException, e.response
+      raise_error(e)
     end
 
     def delete(monitor_id)
       response = RestClient.delete "#{address_port}/monitors/#{monitor_id}", auth_cookie
       parse_json(response)
     rescue => e
-      raise ClientException, e.response
+      raise_error(e)
     end
 
-    def find_by(options)
+    def where(options)
       response = RestClient.get "#{address_port}/monitors?#{URI.encode_www_form(options)}", auth_cookie
       parse_json(response)
     end
@@ -74,17 +74,21 @@ module Ragios
       response = RestClient.put "#{address_port}/monitors/#{monitor_id}",json(options), http_request_options
       parse_json(response)
     rescue => e
-      raise ClientException, e.response
+      raise_error(e)
     end
 
     def test(monitor_id)
       response = RestClient.post "#{address_port}/tests", {:id => monitor_id}, http_request_options
       parse_json(response)
     rescue => e
-      raise ClientException, e.response
+      raise_error(e)
     end
 
 private
+
+    def raise_error(e)
+      e.respond_to?('response') ? raise(ClientException, e.response) : raise(e)
+    end
 
     def auth_cookie
       {:cookies => {:AuthSession => auth_session}}
@@ -114,7 +118,7 @@ private
       hash = Yajl::Parser.parse(auth.to_str)
       hash['AuthSession']
     rescue => e
-      raise ClientException, e.response
+      raise_error(e)
     end
   end
 end

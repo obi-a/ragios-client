@@ -108,7 +108,7 @@ describe "Ragios Client" do
     #setup ends
 
     options = {tag: 'test', every: '5m', monitor: unique_name}
-    found_monitors = @ragios.find_by(options)
+    found_monitors = @ragios.where(options)
     found_monitors.first.should include(monitors.first)
 
     #teardown
@@ -118,7 +118,7 @@ describe "Ragios Client" do
 
   it "returns an empty array when no monitor matches multiple key/value pairs" do
     options = {something: "dont_exist", every: "5m", monitor: "dont_exist"}
-    @ragios.find_by(options).should == []
+    @ragios.where(options).should == []
   end
 
   it "should update a monitor" do
