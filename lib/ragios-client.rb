@@ -26,65 +26,41 @@ module Ragios
     end
 
     def add(monitors)
-      response = RestClient.post "#{address_port}/monitors/", generate_json(monitors), http_request_options
-      parse_json(response.body)
-    rescue => e
-      raise_error(e)
+      api_request { RestClient.post "#{address_port}/monitors/", generate_json(monitors), http_request_options }
     end
-
     def find(monitor_id)
-      response = RestClient.get "#{address_port}/monitors/#{monitor_id}/", auth_cookie
-      parse_json(response.body)
-    rescue => e
-      raise_error(e)
+      api_request { RestClient.get "#{address_port}/monitors/#{monitor_id}/", auth_cookie }
     end
-
     def all
-      response = RestClient.get "#{address_port}/monitors/", auth_cookie
-      parse_json(response.body)
+      api_request { RestClient.get "#{address_port}/monitors/", auth_cookie }
     end
-
     def stop(monitor_id)
-      response = RestClient.put "#{address_port}/monitors/#{monitor_id}",{:status => "stopped"}, http_request_options
-      parse_json(response)
-    rescue => e
-      raise_error(e)
+      api_request { RestClient.put "#{address_port}/monitors/#{monitor_id}",{:status => "stopped"}, http_request_options }
     end
-
     def restart(monitor_id)
-      response = RestClient.put "#{address_port}/monitors/#{monitor_id}",{:status => "active"},http_request_options
-      parse_json(response)
-    rescue => e
-      raise_error(e)
+      api_request { RestClient.put "#{address_port}/monitors/#{monitor_id}",{:status => "active"},http_request_options }
     end
-
     def delete(monitor_id)
-      response = RestClient.delete "#{address_port}/monitors/#{monitor_id}", auth_cookie
-      parse_json(response)
-    rescue => e
-      raise_error(e)
+      api_request { RestClient.delete "#{address_port}/monitors/#{monitor_id}", auth_cookie }
     end
-
     def where(options)
-      response = RestClient.get "#{address_port}/monitors?#{URI.encode_www_form(options)}", auth_cookie
-      parse_json(response)
+      api_request { RestClient.get "#{address_port}/monitors?#{URI.encode_www_form(options)}", auth_cookie }
     end
-
     def update(monitor_id, options)
-      response = RestClient.put "#{address_port}/monitors/#{monitor_id}",generate_json(options), http_request_options
-      parse_json(response)
-    rescue => e
-      raise_error(e)
+      api_request { RestClient.put "#{address_port}/monitors/#{monitor_id}",generate_json(options), http_request_options }
     end
 
     def test(monitor_id)
-      response = RestClient.post "#{address_port}/tests", {:id => monitor_id}, http_request_options
+      api_request { RestClient.post "#{address_port}/tests", {:id => monitor_id}, http_request_options }
+    end
+
+private
+    def api_request
+      response = yield
       parse_json(response)
     rescue => e
       raise_error(e)
     end
-
-private
 
     def raise_error(e)
       e.respond_to?('response') ? raise(ClientException, e.response) : raise(e)
