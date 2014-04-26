@@ -60,7 +60,7 @@ describe "Ragios Client" do
   end
 
   it "cannot add a badly formed monitor" do
-    expect{@ragios.add("bad data")}.to raise_error(Ragios::ClientException)
+    expect{@ragios.add("bad data")}.to raise_error(JSON::GeneratorError)
   end
 
   it "should retrieve a monitor by id" do
@@ -158,7 +158,7 @@ describe "Ragios Client" do
     monitor_id = returned_monitors.first[:_id]
     #setup ends
 
-    expect { @ragios.update(monitor_id,"bad data") }.to raise_error(Ragios::ClientException)
+    expect { @ragios.update(monitor_id,"bad data") }.to raise_error(JSON::GeneratorError)
 
     #teardown
     hash = @ragios.delete(monitor_id)

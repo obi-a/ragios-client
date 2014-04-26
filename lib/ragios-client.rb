@@ -1,5 +1,5 @@
 require 'rest_client'
-require 'yajl'
+require 'json/pure'
 require 'uri'
 
 module Ragios
@@ -26,7 +26,7 @@ module Ragios
     end
 
     def add(monitors)
-      response = RestClient.post "#{address_port}/monitors/", json(monitors), http_request_options
+      response = RestClient.post "#{address_port}/monitors/", generate_json(monitors), http_request_options
       parse_json(response.body)
     rescue => e
       raise_error(e)
@@ -71,7 +71,7 @@ module Ragios
     end
 
     def update(monitor_id, options)
-      response = RestClient.put "#{address_port}/monitors/#{monitor_id}",json(options), http_request_options
+      response = RestClient.put "#{address_port}/monitors/#{monitor_id}",generate_json(options), http_request_options
       parse_json(response)
     rescue => e
       raise_error(e)
@@ -104,19 +104,18 @@ private
       "#{@address}:#{@port}"
     end
 
-    def json(str)
-      Yajl::Encoder.encode(str)
+    def generate_json(str)
+      JSON.generate(str)
     end
 
     def parse_json(str)
-      Yajl::Parser.parse(str, :symbolize_keys => true)
+      JSON.parse(str, symbolize_names: true)
     end
 
     def auth_session
-      #deal with performance when it becomes a problem not yet a priority
       auth = RestClient.post "#{address_port}/session", { :username=> @username, :password => @password}
-      hash = Yajl::Parser.parse(auth.to_str)
-      hash['AuthSession']
+      hash = parse_json(auth)
+      hash[:AuthSession]
     rescue => e
       raise_error(e)
     end
