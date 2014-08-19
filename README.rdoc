@@ -15,14 +15,15 @@
 
  ragios.login('admin', 'password')
 
- monitors = [{monitor: "my website",
-  every: "5m",
-  url: "http://mywebsite.com",
-  via: "twtter_notifier",
-  plugin: "url_monitor"
- }]
+ monitor = {
+   monitor: "my website",
+   every: "5m",
+   url: "http://mywebsite.com",
+   via: "twtter_notifier",
+   plugin: "url_monitor"
+ }
 
- ragios.add monitors
+ ragios.add monitor
 
  ragios.find(monitor_id)
 
@@ -49,6 +50,5 @@
 
 == Copyright
 
-Copyright (c) 2013 obi-a. See LICENSE.txt for
+Copyright (c) 2014 obi-a. See LICENSE.txt for
 further details.
-

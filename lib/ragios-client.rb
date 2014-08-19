@@ -25,8 +25,8 @@ module Ragios
       auth_session
     end
 
-    def add(monitors)
-      api_request { RestClient.post "#{address_port}/monitors/", generate_json(monitors), http_request_options }
+    def add(monitor)
+      api_request { RestClient.post "#{address_port}/monitors/", generate_json(monitor), http_request_options }
     end
     def find(monitor_id)
       api_request { RestClient.get "#{address_port}/monitors/#{monitor_id}/", auth_cookie }
