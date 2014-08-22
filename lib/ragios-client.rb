@@ -15,8 +15,8 @@ module Ragios
     def initialize(args = {})
       @address = args.fetch(:address, 'http://127.0.0.1')
       @port = args.fetch(:port, '5041')
-      @username = args.fetch(:username, '')
-      @password = args.fetch(:password, '')
+      @username = args.fetch(:username, nil)
+      @password = args.fetch(:password, nil)
     end
 
     def login(username,password)
@@ -89,6 +89,7 @@ private
     end
 
     def auth_session
+      return "" if [@username, @password].any? { |e| e.nil? }
       auth = RestClient.post "#{address_port}/session", { :username=> @username, :password => @password}
       hash = parse_json(auth)
       hash[:AuthSession]
