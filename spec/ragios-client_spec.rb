@@ -4,12 +4,17 @@ require File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib/ragios-cli
 #use for fast tests
 plugin = "mock_plugin"
 
+def generate_json(str)
+  JSON.generate(str)
+end
+
 admin = 'admin'
 password = 'ragios'
 
 describe "Ragios Client" do
   before(:each) do
-    @ragios = Ragios::Client.new(username: admin,password: password)
+    #@ragios = Ragios::Client.new(username: admin, password: password)
+    @ragios = Ragios::Client.new
   end
   describe "#add" do
     it "adds a monitor" do
@@ -23,7 +28,7 @@ describe "Ragios Client" do
       }
 
       returned_monitor = @ragios.add(monitor)
-      returned_monitor.should include(monitors)
+      returned_monitor.should include(monitor)
       monitor_id = returned_monitor[:_id]
 
       #teardown
@@ -31,7 +36,7 @@ describe "Ragios Client" do
     end
 
     it "cannot add a monitor with no plugin" do
-      monitors = {
+      monitor = {
         monitor: "Google",
         url: "http://google.com",
         every: "5m",
@@ -79,7 +84,7 @@ describe "Ragios Client" do
         tag: "test"
       }
 
-      returned_monitor = @ragios.add(monitor)
+      returned_monitor = @ragios.add(@monitor)
       @monitor_id = returned_monitor[:_id]
     end
     describe "#find" do
@@ -88,7 +93,7 @@ describe "Ragios Client" do
         received_monitor.should include(@monitor)
       end
       it "cannot retrieve a monitor that doesnt exist" do
-        expect{ @ragios.find('dont_exist') }.to raise_error(Ragios::ClientException, "No monitor found with id = dont_exist")
+        expect{ @ragios.find('dont_exist') }.to raise_error(Ragios::ClientException, generate_json(error: "No monitor found with id = dont_exist"))
       end
     end
     describe "#where" do
@@ -105,33 +110,32 @@ describe "Ragios Client" do
     describe "#update" do
       it "should update a monitor" do
         update_options = {every: "10m", via: ["twitter_notifier"]}
-        updated_monitor = @ragios.update(@monitor_id, update_options)
-        updated_monitor.should include(update_options)
+        @ragios.update(@monitor_id, update_options).should == {ok: true}
       end
       it "cannot update a monitor with bad data" do
         expect { @ragios.update(@monitor_id,"bad data") }.to raise_error(JSON::GeneratorError)
       end
       it "cannot update a monitor that don't exist" do
         update_options = {every: "5m", via: ["twitter_notifier"]}
-        expect { @ragios.update("dont_exist", update_options) }.to raise_error(Ragios::ClientException, "No monitor found with id = dont_exist")
+        expect { @ragios.update("dont_exist", update_options) }.to raise_error(Ragios::ClientException, generate_json(error: "No monitor found with id = dont_exist"))
       end
     end
     describe "#test" do
       it "tests a monitor" do
         @ragios.test(@monitor_id).should == {ok: true}
-        hash[:ok].should == true
       end
       it "cannot test a monitor that don't exist" do
-        expect { @ragios.test("dont_exist") }.to raise_error(Ragios::ClientException, "No monitor found with id = dont_exist")
+        expect { @ragios.test("dont_exist") }.to raise_error(Ragios::ClientException, generate_json(error: "No monitor found with id = dont_exist"))
       end
     end
     describe "#delete" do
       it "deletes a monitor" do
-        @ragios.delete(@monitor_id).should == {ok: true}
+        new_monitor_id = @ragios.add(@monitor)[:_id]
+        @ragios.delete(new_monitor_id).should == {ok: true}
       end
       it "cannot delete a monitor that doesnt exist" do
         this_monitor_id = "dont_exist"
-        expect{ @ragios.find(this_monitor_id) }.to raise_error(Ragios::ClientException, "No monitor found with id = #{this_monitor_id}")
+        expect{ @ragios.find(this_monitor_id) }.to raise_error(Ragios::ClientException, generate_json(error: "No monitor found with id = #{this_monitor_id}"))
       end
     end
     describe "#stop" do
@@ -148,8 +152,8 @@ describe "Ragios Client" do
         @ragios.stop(@monitor_id).should == {ok: true}
       end
       it "cannot stop a monitor that dont exist" do
-        monitor_id = "dont_exist"
-        expect { @ragios.stop(monitor_id) }.to raise_error(Ragios::ClientException, "No monitor found with id = #{monitor_id}")
+        this_monitor_id = "dont_exist"
+        expect { @ragios.stop(this_monitor_id) }.to raise_error(Ragios::ClientException, generate_json(error: "No monitor found with id = #{this_monitor_id}"))
       end
     end
     describe "#restart" do
@@ -167,8 +171,8 @@ describe "Ragios Client" do
         @ragios.restart(@monitor_id).should == {ok: true}
       end
       it "cannot restart a monitor that dont exist" do
-        monitor_id = "dont_exist"
-        expect { @ragios.restart(monitor_id) }.to raise_error(Ragios::ClientException, "No monitor found with id = #{monitor_id}")
+        this_monitor_id = "dont_exist"
+        expect { @ragios.restart(this_monitor_id) }.to raise_error(Ragios::ClientException, generate_json(error: "No monitor found with id = #{this_monitor_id}"))
       end
     end
     describe "#all" do
@@ -188,7 +192,7 @@ describe "Ragios Client" do
   end
 
   it "rejects incorrect login credentials" do
-    expect { @ragios.login('incorret','incorret') }.to raise_error(Ragios::ClientException, "You are not authorized to access this resource")
+    expect { @ragios.login('incorret','incorret') }.to raise_error(Ragios::ClientException, generate_json(error: "You are not authorized to access this resource"))
   end
 
   it "has default settings" do
