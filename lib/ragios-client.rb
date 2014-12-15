@@ -31,8 +31,9 @@ module Ragios
     def find(monitor_id)
       api_request { RestClient.get "#{address_port}/monitors/#{monitor_id}/", auth_cookie }
     end
-    def all
-      api_request { RestClient.get "#{address_port}/monitors/", auth_cookie }
+    def all(take = nil)
+      params = take ? "?take=#{take}" : ""
+      api_request { RestClient.get "#{address_port}/monitors#{params}", auth_cookie }
     end
     def stop(monitor_id)
       api_request { RestClient.put "#{address_port}/monitors/#{monitor_id}",{:status => "stopped"}, http_request_options }
@@ -44,7 +45,7 @@ module Ragios
       api_request { RestClient.delete "#{address_port}/monitors/#{monitor_id}", auth_cookie }
     end
     def where(options)
-      api_request { RestClient.get "#{address_port}/monitors?#{URI.encode_www_form(options)}", auth_cookie }
+      api_request { RestClient.get "#{address_port}/monitors/attributes?#{URI.encode_www_form(options)}", auth_cookie }
     end
     def update(monitor_id, options)
       api_request { RestClient.put "#{address_port}/monitors/#{monitor_id}",generate_json(options), http_request_options }

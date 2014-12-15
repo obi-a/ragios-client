@@ -181,6 +181,9 @@ describe "Ragios Client" do
         retrieved_monitors.should_not be_empty
         retrieved_monitors.should be_an_instance_of Array
       end
+      it "can limit the number of monitors retrieved" do
+        @ragios.all(take = 1).count.should == 1
+      end
     end
     after(:each) do
       @ragios.delete(@monitor_id)
