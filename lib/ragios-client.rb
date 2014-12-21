@@ -25,20 +25,20 @@ module Ragios
       auth_session
     end
 
-    def add(monitor)
+    def create(monitor)
       api_request { RestClient.post "#{address_port}/monitors/", generate_json(monitor), http_request_options }
     end
     def find(monitor_id)
       api_request { RestClient.get "#{address_port}/monitors/#{monitor_id}/", auth_cookie }
     end
-    def all(take = nil)
-      params = take ? "?take=#{take}" : ""
+    def all(limit = nil)
+      params = limit ? "?take=#{limit}" : ""
       api_request { RestClient.get "#{address_port}/monitors#{params}", auth_cookie }
     end
     def stop(monitor_id)
       api_request { RestClient.put "#{address_port}/monitors/#{monitor_id}",{:status => "stopped"}, http_request_options }
     end
-    def restart(monitor_id)
+    def start(monitor_id)
       api_request { RestClient.put "#{address_port}/monitors/#{monitor_id}",{:status => "active"},http_request_options }
     end
     def delete(monitor_id)
@@ -50,12 +50,27 @@ module Ragios
     def update(monitor_id, options)
       api_request { RestClient.put "#{address_port}/monitors/#{monitor_id}",generate_json(options), http_request_options }
     end
-
+    def events(monitor_id, startdate, enddate, limit=nil)
+      api_request { RestClient.get "#{address_port}/monitors/#{monitor_id}/events", {params: options(startdate, enddate, limit)} }
+    end
+    def notifications(monitor_id, startdate, enddate, limit=nil)
+      api_request { RestClient.get "#{address_port}/monitors/#{monitor_id}/notifications", {params: options(startdate, enddate, limit)} }
+    end
+    def events_by_state(monitor_id, state, startdate, enddate, limit=nil)
+      api_request { RestClient.get "#{address_port}/monitors/#{monitor_id}/events_by_state/#{state}", {params: options(startdate, enddate, limit)} }
+    end
     def test(monitor_id)
       api_request { RestClient.post "#{address_port}/tests", {:id => monitor_id}, http_request_options }
     end
 
 private
+    def options(startdate, enddate, limit = nil)
+      options = {}
+      options[:start_date] = startdate
+      options[:end_date] = enddate
+      options[:take] = limit if limit
+      options
+    end
     def api_request
       response = yield
       parse_json(response)

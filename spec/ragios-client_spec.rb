@@ -16,8 +16,37 @@ describe "Ragios Client" do
     #@ragios = Ragios::Client.new(username: admin, password: password)
     @ragios = Ragios::Client.new
   end
-  describe "#add" do
-    it "adds a monitor" do
+  describe "queries" do
+    before(:each) do
+      monitor = {
+        monitor: "Google",
+        url: "http://google.com",
+        every: "5m",
+        contact: "admin@mail.com",
+        via: ["gmail_notifier","twitter_notifier"],
+        plugin: plugin
+      }
+      @query_monitor_id = @ragios.create(monitor)[:_id]
+    end
+    describe "#events" do
+      it "returns all events by monitor" do
+        @ragios.events(@query_monitor_id, "1980","2015").should_not == 0
+        first_id = @ragios.events(@query_monitor_id, "1980","2015").first[:monitor][:_id]
+        @query_monitor_id.should == first_id
+        @ragios.events(@query_monitor_id, "1980","2015", 1).count.should == 1
+      end
+    end
+    describe "#events_by_state" do
+      it "returns a monitor's events by specified state" do
+        @ragios.events_by_state(@query_monitor_id, "started", "1980","2015",1).count.should == 1
+      end
+    end
+    after(:each) do
+      @ragios.delete(@query_monitor_id)
+    end
+  end
+  describe "#create" do
+    it "creates a monitor" do
       monitor = {
         monitor: "Google",
         url: "http://google.com",
@@ -27,7 +56,7 @@ describe "Ragios Client" do
         plugin: plugin
       }
 
-      returned_monitor = @ragios.add(monitor)
+      returned_monitor = @ragios.create(monitor)
       returned_monitor.should include(monitor)
       monitor_id = returned_monitor[:_id]
 
@@ -35,7 +64,7 @@ describe "Ragios Client" do
       @ragios.delete(monitor_id)
     end
 
-    it "cannot add a monitor with no plugin" do
+    it "cannot create a monitor with no plugin" do
       monitor = {
         monitor: "Google",
         url: "http://google.com",
@@ -44,14 +73,14 @@ describe "Ragios Client" do
         via: "gmail_notifier"
       }
       begin
-        @ragios.add monitor
+        @ragios.create monitor
       rescue => e
         e.should be_an_instance_of Ragios::ClientException
         e.message.should include("No Plugin Found")
       end
     end
 
-    it "cannot add a monitor with no notifier" do
+    it "cannot create a monitor with no notifier" do
       monitor = {
         monitor: "Google",
         url: "http://google.com",
@@ -60,15 +89,15 @@ describe "Ragios Client" do
         plugin: plugin
       }
       begin
-        @ragios.add monitor
+        @ragios.create monitor
       rescue Exception => e
         e.should be_an_instance_of Ragios::ClientException
         e.message.should include("No Notifier Found")
       end
     end
 
-    it "cannot add a badly formed monitor" do
-      expect{@ragios.add("bad data")}.to raise_error(JSON::GeneratorError)
+    it "cannot create a badly formed monitor" do
+      expect{@ragios.create("bad data")}.to raise_error(JSON::GeneratorError)
     end
   end
   describe "More API calls" do
@@ -84,7 +113,7 @@ describe "Ragios Client" do
         tag: "test"
       }
 
-      returned_monitor = @ragios.add(@monitor)
+      returned_monitor = @ragios.create(@monitor)
       @monitor_id = returned_monitor[:_id]
     end
     describe "#find" do
@@ -130,7 +159,7 @@ describe "Ragios Client" do
     end
     describe "#delete" do
       it "deletes a monitor" do
-        new_monitor_id = @ragios.add(@monitor)[:_id]
+        new_monitor_id = @ragios.create(@monitor)[:_id]
         @ragios.delete(new_monitor_id).should == {ok: true}
       end
       it "cannot delete a monitor that doesnt exist" do
@@ -156,23 +185,23 @@ describe "Ragios Client" do
         expect { @ragios.stop(this_monitor_id) }.to raise_error(Ragios::ClientException, generate_json(error: "No monitor found with id = #{this_monitor_id}"))
       end
     end
-    describe "#restart" do
-      it "restarts a stopped monitor" do
+    describe "#start" do
+      it "starts a stopped monitor" do
         @ragios.stop(@monitor_id)
         stopped_monitor = @ragios.find(@monitor_id)
         stopped_monitor[:status_].should == "stopped"
 
-        @ragios.restart(@monitor_id).should == {ok: true}
+        @ragios.start(@monitor_id).should == {ok: true}
 
         active_monitor = @ragios.find(@monitor_id)
         active_monitor[:status_].should == "active"
 
-        #restart monitor is idempotent
-        @ragios.restart(@monitor_id).should == {ok: true}
+        #start monitor is idempotent
+        @ragios.start(@monitor_id).should == {ok: true}
       end
-      it "cannot restart a monitor that dont exist" do
+      it "cannot start a monitor that dont exist" do
         this_monitor_id = "dont_exist"
-        expect { @ragios.restart(this_monitor_id) }.to raise_error(Ragios::ClientException, generate_json(error: "No monitor found with id = #{this_monitor_id}"))
+        expect { @ragios.start(this_monitor_id) }.to raise_error(Ragios::ClientException, generate_json(error: "No monitor found with id = #{this_monitor_id}"))
       end
     end
     describe "#all" do
@@ -182,7 +211,7 @@ describe "Ragios Client" do
         retrieved_monitors.should be_an_instance_of Array
       end
       it "can limit the number of monitors retrieved" do
-        @ragios.all(take = 1).count.should == 1
+        @ragios.all(limit = 1).count.should == 1
       end
     end
     after(:each) do
