@@ -23,7 +23,7 @@
    plugin: "url_monitor"
  }
 
- ragios.add monitor
+ ragios.create monitor
 
  ragios.find(monitor_id)
 
@@ -40,6 +40,12 @@
  ragios.update(monitor_id, options)
 
  ragios.test(monitor_id)
+
+ ragios.events(monitor_id, start_date, end_date, limit)
+
+ ragios.events_by_type(monitor_id, event_type, start_date, end_date, limit)
+
+ ragios.events_by_state(monitor_id, state, start_date, end_date, limit)
 
  ragios.address
  #=> http://localhost

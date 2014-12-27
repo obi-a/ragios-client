@@ -38,7 +38,8 @@ describe "Ragios Client" do
     end
     describe "#events_by_state" do
       it "returns a monitor's events by specified state" do
-        @ragios.events_by_state(@query_monitor_id, "started", "1980","2015",1).count.should == 1
+        sleep 1
+        @ragios.events_by_state(@query_monitor_id, "passed", "1980","2015",1).count.should == 1
       end
     end
     after(:each) do

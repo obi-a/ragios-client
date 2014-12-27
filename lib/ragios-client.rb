@@ -53,8 +53,8 @@ module Ragios
     def events(monitor_id, startdate, enddate, limit=nil)
       api_request { RestClient.get "#{address_port}/monitors/#{monitor_id}/events", {params: options(startdate, enddate, limit)} }
     end
-    def notifications(monitor_id, startdate, enddate, limit=nil)
-      api_request { RestClient.get "#{address_port}/monitors/#{monitor_id}/notifications", {params: options(startdate, enddate, limit)} }
+    def events_by_type(monitor_id, type, startdate, enddate, limit=nil)
+      api_request { RestClient.get "#{address_port}/monitors/#{monitor_id}/events_by_type/#{type}", {params: options(startdate, enddate, limit)} }
     end
     def events_by_state(monitor_id, state, startdate, enddate, limit=nil)
       api_request { RestClient.get "#{address_port}/monitors/#{monitor_id}/events_by_state/#{state}", {params: options(startdate, enddate, limit)} }
