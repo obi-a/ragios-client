@@ -50,6 +50,16 @@ module Ragios
     def update(monitor_id, options)
       api_request { RestClient.put "#{address_port}/monitors/#{monitor_id}",generate_json(options), http_request_options }
     end
+    def find_event(event_id)
+      api_request { RestClient.get "#{address_port}/events/#{event_id}/", auth_cookie }
+    end
+    def all_events(limit = nil)
+      params = limit ? "?take=#{limit}" : ""
+      api_request { RestClient.get "#{address_port}/events#{params}", auth_cookie }
+    end
+    def delete_event(event_id)
+      api_request { RestClient.delete "#{address_port}/events/#{event_id}", auth_cookie }
+    end
     def events(monitor_id, startdate, enddate, limit=nil)
       api_request { RestClient.get "#{address_port}/monitors/#{monitor_id}/events", {params: options(startdate, enddate, limit)} }
     end
