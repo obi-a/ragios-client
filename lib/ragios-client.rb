@@ -93,12 +93,12 @@ private
     end
 
     def auth_cookie
-      {:cookies => {:AuthSession => auth_session}}
+      {:cookies => {:RagiosAuthSession => auth_session}}
     end
 
     def http_request_options
       {:content_type => :json,
-       :cookies => {:AuthSession => auth_session}
+       :cookies => {:RagiosAuthSession => auth_session}
       }
     end
 
@@ -118,7 +118,7 @@ private
       return "" if [@username, @password].any? { |e| e.nil? }
       auth = RestClient.post "#{address_port}/session", { :username=> @username, :password => @password}
       hash = parse_json(auth)
-      hash[:AuthSession]
+      hash[:RagiosAuthSession]
     rescue => e
       raise_error(e)
     end
