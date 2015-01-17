@@ -61,13 +61,13 @@ module Ragios
       api_request { RestClient.delete "#{address_port}/events/#{event_id}", auth_cookie }
     end
     def events(monitor_id, startdate, enddate, limit=nil)
-      api_request { RestClient.get "#{address_port}/monitors/#{monitor_id}/events", {params: options(startdate, enddate, limit)} }
+      api_request { RestClient.get "#{address_port}/monitors/#{monitor_id}/events", options(startdate, enddate, limit) }
     end
     def events_by_type(monitor_id, type, startdate, enddate, limit=nil)
-      api_request { RestClient.get "#{address_port}/monitors/#{monitor_id}/events_by_type/#{type}", {params: options(startdate, enddate, limit)} }
+      api_request { RestClient.get "#{address_port}/monitors/#{monitor_id}/events_by_type/#{type}", options(startdate, enddate, limit) }
     end
     def events_by_state(monitor_id, state, startdate, enddate, limit=nil)
-      api_request { RestClient.get "#{address_port}/monitors/#{monitor_id}/events_by_state/#{state}", {params: options(startdate, enddate, limit)} }
+      api_request { RestClient.get "#{address_port}/monitors/#{monitor_id}/events_by_state/#{state}", options(startdate, enddate, limit) }
     end
     def test(monitor_id)
       api_request { RestClient.post "#{address_port}/tests", {:id => monitor_id}, http_request_options }
@@ -75,11 +75,13 @@ module Ragios
 
 private
     def options(startdate, enddate, limit = nil)
-      options = {}
-      options[:start_date] = startdate
-      options[:end_date] = enddate
-      options[:take] = limit if limit
-      options
+      params = {}
+      params[:start_date] = startdate
+      params[:end_date] = enddate
+      params[:take] = limit if limit
+      query_options = auth_cookie
+      query_options[:params] = params
+      query_options
     end
     def api_request
       response = yield

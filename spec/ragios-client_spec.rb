@@ -30,16 +30,27 @@ describe "Ragios Client" do
     end
     describe "#events" do
       it "returns all events by monitor" do
-        @ragios.events(@query_monitor_id, "1980","2015").should_not == 0
-        first_id = @ragios.events(@query_monitor_id, "1980","2015").first[:monitor][:_id]
+        sleep 2
+        events = @ragios.events(@query_monitor_id, "1980","2040")
+        events.should_not == 0
+        first_id = events.first[:monitor][:_id]
         @query_monitor_id.should == first_id
-        @ragios.events(@query_monitor_id, "1980","2015", 1).count.should == 1
+        @ragios.events(@query_monitor_id, "1980","2040", 1).count.should == 1
       end
     end
     describe "#events_by_state" do
       it "returns a monitor's events by specified state" do
         sleep 1
-        @ragios.events_by_state(@query_monitor_id, "passed", "1980","2015",1).count.should == 1
+        @ragios.events_by_state(@query_monitor_id, "passed", "1980","2040",1).count.should == 1
+      end
+    end
+    describe "more events API" do
+      it "returns all events" do
+        event = @ragios.all_events(1).first
+        new_event = @ragios.find_event(event[:_id])
+        new_event.should == event
+        @ragios.delete_event(event[:_id])
+        expect { @ragios.find_event(event[:_id]) }.to raise_error(Ragios::ClientException)
       end
     end
     after(:each) do
