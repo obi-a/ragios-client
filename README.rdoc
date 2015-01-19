@@ -47,6 +47,12 @@
 
  ragios.events_by_state(monitor_id, state, start_date, end_date, limit)
 
+ ragios.find_event(event_id)
+
+ ragios.delete_event(event_id)
+
+ ragios.all_events(limit)
+
  ragios.address
  #=> http://localhost
 
