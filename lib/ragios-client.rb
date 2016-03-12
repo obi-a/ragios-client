@@ -1,5 +1,5 @@
 require 'rest_client'
-require 'json/pure'
+require 'multi_json'
 require 'uri'
 
 module Ragios
@@ -109,11 +109,11 @@ private
     end
 
     def generate_json(str)
-      JSON.generate(str)
+      MultiJson.dump(str)
     end
 
     def parse_json(str)
-      JSON.parse(str, symbolize_names: true)
+      MultiJson.load(str, symbolize_names: true)
     end
 
     def auth_session

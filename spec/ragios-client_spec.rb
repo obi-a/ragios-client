@@ -109,7 +109,7 @@ describe "Ragios Client" do
     end
 
     it "cannot create a badly formed monitor" do
-      expect{@ragios.create("bad data")}.to raise_error(JSON::GeneratorError)
+      expect{@ragios.create("bad data")}.to raise_error(Ragios::ClientException)
     end
   end
   describe "More API calls" do
@@ -154,7 +154,7 @@ describe "Ragios Client" do
         @ragios.update(@monitor_id, update_options).should == {ok: true}
       end
       it "cannot update a monitor with bad data" do
-        expect { @ragios.update(@monitor_id,"bad data") }.to raise_error(JSON::GeneratorError)
+        expect { @ragios.update(@monitor_id,"bad data") }.to raise_error(Ragios::ClientException)
       end
       it "cannot update a monitor that don't exist" do
         update_options = {every: "5m", via: ["twitter_notifier"]}
