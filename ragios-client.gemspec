@@ -32,7 +32,7 @@ Gem::Specification.new do |s|
   ]
   s.homepage = "http://github.com/obi-a/ragios-client"
   s.licenses = ["MIT"]
-  s.rubygems_version = "2.5.1"
+  s.rubygems_version = "2.4.8"
   s.summary = "Ruby client for ragios"
 
   if s.respond_to? :specification_version then
