@@ -73,6 +73,10 @@ module Ragios
       api_request { RestClient.post "#{address_port}/tests", {:id => monitor_id}, http_request_options }
     end
 
+    def maestro_test(url, source_code)
+      api_request { RestClient.post "#{address_port}/maestro/test", {url: url, source_code: source_code}, http_request_options }
+    end
+
 private
     def options(startdate, enddate, limit = nil)
       params = {}
