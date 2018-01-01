@@ -32,7 +32,7 @@ module Ragios
       api_request { RestClient.get "#{address_port}/monitors/#{monitor_id}/", auth_cookie }
     end
     def all(limit = nil)
-      params = limit ? "?take=#{limit}" : ""
+      params = limit ? "?limit=#{limit}" : ""
       api_request { RestClient.get "#{address_port}/monitors#{params}", auth_cookie }
     end
     def stop(monitor_id)
@@ -54,7 +54,7 @@ module Ragios
       api_request { RestClient.get "#{address_port}/events/#{event_id}/", auth_cookie }
     end
     def all_events(limit = nil)
-      params = limit ? "?take=#{limit}" : ""
+      params = limit ? "?limit=#{limit}" : ""
       api_request { RestClient.get "#{address_port}/events#{params}", auth_cookie }
     end
     def delete_event(event_id)
@@ -82,7 +82,7 @@ private
       params = {}
       params[:start_date] = startdate
       params[:end_date] = enddate
-      params[:take] = limit if limit
+      params[:limit] = limit if limit
       query_options = auth_cookie
       query_options[:params] = params
       query_options

@@ -9,7 +9,7 @@ def generate_json(str)
 end
 
 admin = 'admin'
-password = 'ragios'
+password = 'trusted'
 
 describe "Ragios Client" do
   before(:each) do
@@ -23,7 +23,7 @@ describe "Ragios Client" do
         url: "http://google.com",
         every: "5m",
         contact: "admin@mail.com",
-        via: ["gmail_notifier","twitter_notifier"],
+        via: ["ses","log_notifier"],
         plugin: plugin
       }
       @query_monitor_id = @ragios.create(monitor)[:_id]
@@ -33,7 +33,7 @@ describe "Ragios Client" do
         sleep 2
         events = @ragios.events(@query_monitor_id, "1980","2040")
         events.should_not == 0
-        first_id = events.first[:monitor][:_id]
+        first_id = events.first[:monitor_id]
         @query_monitor_id.should == first_id
         @ragios.events(@query_monitor_id, "1980","2040", 1).count.should == 1
       end
@@ -41,7 +41,7 @@ describe "Ragios Client" do
     describe "#events_by_state" do
       it "returns a monitor's events by specified state" do
         sleep 1
-        @ragios.events_by_state(@query_monitor_id, "passed", "1980","2040",1).count.should == 1
+        @ragios.events_by_state(@query_monitor_id, "create", "1980","2040",1).count.should == 1
       end
     end
     describe "more events API" do
@@ -64,7 +64,7 @@ describe "Ragios Client" do
         url: "http://google.com",
         every: "5m",
         contact: "admin@mail.com",
-        via: ["gmail_notifier","twitter_notifier"],
+        via: ["ses","log_notifier"],
         plugin: plugin
       }
 
@@ -82,7 +82,7 @@ describe "Ragios Client" do
         url: "http://google.com",
         every: "5m",
         contact: "admin@mail.com",
-        via: "gmail_notifier"
+        via: "ses"
       }
       begin
         @ragios.create monitor
@@ -120,7 +120,7 @@ describe "Ragios Client" do
         url: "http://google.com",
         every: "5m",
         contact: "admin@mail.com",
-        via: ["gmail_notifier"],
+        via: ["ses"],
         plugin: plugin,
         tag: "test"
       }
@@ -150,14 +150,14 @@ describe "Ragios Client" do
     end
     describe "#update" do
       it "should update a monitor" do
-        update_options = {every: "10m", via: ["twitter_notifier"]}
+        update_options = {every: "10m", via: ["log_notifier"]}
         @ragios.update(@monitor_id, update_options).should == {ok: true}
       end
       it "cannot update a monitor with bad data" do
         expect { @ragios.update(@monitor_id,"bad data") }.to raise_error(Ragios::ClientException)
       end
       it "cannot update a monitor that don't exist" do
-        update_options = {every: "5m", via: ["twitter_notifier"]}
+        update_options = {every: "5m", via: ["log_notifier"]}
         expect { @ragios.update("dont_exist", update_options) }.to raise_error(Ragios::ClientException, generate_json(error: "No monitor found with id = dont_exist"))
       end
     end
