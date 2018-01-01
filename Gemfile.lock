@@ -30,7 +30,7 @@ GEM
       nokogiri (= 1.5.10)
       rake
       rdoc
-    json (1.8.3)
+    json (1.8.6)
     jwt (1.5.1)
     method_source (0.8.2)
     mime-types (2.99.1)
@@ -88,4 +88,4 @@ DEPENDENCIES
   rspec
 
 BUNDLED WITH
-   1.11.2
+   1.15.1
