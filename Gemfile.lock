@@ -56,7 +56,7 @@ GEM
       method_source (~> 0.8.1)
       slop (~> 3.4)
     psych (2.2.4)
-    rack (2.0.3)
+    rack (2.0.6)
     rake (12.3.0)
     rdoc (3.12.2)
       json (~> 1.4)
@@ -92,9 +92,10 @@ DEPENDENCIES
   jeweler (~> 2.3.7)
   multi_json
   pry
+  rack (>= 2.0.6)
   rdoc (~> 3.12)
   rest-client
   rspec
 
 BUNDLED WITH
-   1.15.1
+   1.15.4

@@ -1,6 +1,7 @@
 source "http://rubygems.org"
 gem "rest-client"
 gem "multi_json"
+gem "rack", ">= 2.0.6"
 
 group :development do
   gem "pry"

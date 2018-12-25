@@ -1,0 +1,11 @@
+version: '3'
+services:
+  ragios-client:
+    build: .
+    volumes:
+      - .:/usr/src/ragios-client
+    ports:
+      - "5041:5041"
+    tty: true
+    stdin_open: true
+    entrypoint: bundle exec rake repl
